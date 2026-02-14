@@ -13,7 +13,6 @@ import java.util.Map;
 @RestController
 public class App {
 
-    // HOME PAGE
     @GetMapping(value = "/", produces = MediaType.TEXT_HTML_VALUE)
     public String home() {
         return """
@@ -22,74 +21,146 @@ public class App {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chennakesavulu Devops github actions using CICD</title>
+  <title>Learn With Kastro | DevOps Masterclass</title>
 
   <style>
     :root{
-      --bg1:#070A12;
+      --bg:#070A12;
       --bg2:#0B1224;
       --card: rgba(255,255,255,0.06);
-      --border: rgba(255,255,255,0.10);
+      --border: rgba(255,255,255,0.12);
       --text:#EAF2FF;
-      --muted: rgba(234,242,255,0.70);
+      --muted: rgba(234,242,255,0.65);
       --primary:#00F5D4;
       --secondary:#FFB703;
       --blue:#3A86FF;
+      --danger:#ff4d6d;
+      --radius: 22px;
+      --shadow: 0 25px 80px rgba(0,0,0,0.55);
+      --transition: 0.25s ease;
+    }
+
+    body.light{
+      --bg:#f4f7ff;
+      --bg2:#ffffff;
+      --card: rgba(0,0,0,0.04);
+      --border: rgba(0,0,0,0.10);
+      --text:#0b1224;
+      --muted: rgba(0,0,0,0.55);
+      --shadow: 0 20px 60px rgba(0,0,0,0.12);
     }
 
     *{margin:0;padding:0;box-sizing:border-box;}
-
     body{
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
-      background: radial-gradient(circle at 20% 10%, rgba(58,134,255,0.18), transparent 40%),
-                  radial-gradient(circle at 80% 60%, rgba(0,245,212,0.12), transparent 45%),
-                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      background:
+        radial-gradient(circle at 20% 10%, rgba(58,134,255,0.16), transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(0,245,212,0.12), transparent 45%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
       min-height:100vh;
       overflow-x:hidden;
+      transition: var(--transition);
     }
 
+    /* Header */
     header{
-      max-width:1200px;
-      margin:0 auto;
-      padding:28px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      backdrop-filter: blur(14px);
+      background: rgba(0,0,0,0.25);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    body.light header{
+      background: rgba(255,255,255,0.65);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .nav{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 18px 20px;
       display:flex;
       align-items:center;
       justify-content:space-between;
+      gap:20px;
     }
 
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:0.5px;
-      font-size:1.1rem;
     }
 
     .logo{
-      width:42px;height:42px;border-radius:14px;
+      width:44px;height:44px;border-radius:16px;
       background: linear-gradient(135deg, var(--primary), var(--blue));
-      box-shadow: 0 0 40px rgba(0,245,212,0.25);
+      box-shadow: 0 0 45px rgba(0,245,212,0.25);
     }
 
-    nav a{
-      color:var(--muted);
+    .nav-links{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .nav-links a{
       text-decoration:none;
-      margin-left:18px;
-      font-weight:600;
-      transition:0.25s;
+      color: var(--muted);
+      font-weight:700;
+      transition: var(--transition);
     }
-    nav a:hover{color:var(--primary);}
+    .nav-links a:hover{color: var(--primary);}
 
+    .toggle{
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:800;
+      transition: var(--transition);
+    }
+    .toggle:hover{transform: translateY(-2px);}
+
+    /* Layout */
+    .wrap{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* Hero */
     .hero{
-      max-width:1200px;
-      margin:0 auto;
-      padding:40px 20px 10px;
       display:grid;
       grid-template-columns: 1.1fr 0.9fr;
-      gap:30px;
-      align-items:center;
+      gap:26px;
+      align-items:stretch;
+      margin-top: 30px;
+    }
+
+    .hero-left{
+      padding: 28px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-left:before{
+      content:'';
+      position:absolute;
+      inset:-50px;
+      background: radial-gradient(circle, rgba(0,245,212,0.14), transparent 55%);
+      z-index:-1;
     }
 
     .badge{
@@ -101,16 +172,16 @@ public class App {
       background: rgba(0,245,212,0.06);
       border-radius:999px;
       color: var(--primary);
-      font-weight:700;
+      font-weight:800;
       letter-spacing:1px;
       font-size:0.95rem;
     }
 
     h1{
       margin-top:18px;
-      font-size:3.2rem;
+      font-size:3.1rem;
       line-height:1.05;
-      font-weight:900;
+      font-weight:950;
       background: linear-gradient(90deg, var(--primary), var(--blue), var(--secondary));
       -webkit-background-clip:text;
       background-clip:text;
@@ -120,92 +191,241 @@ public class App {
     .subtitle{
       margin-top:18px;
       color: var(--muted);
-      font-size:1.25rem;
-      line-height:1.7;
-      max-width:620px;
+      font-size:1.2rem;
+      line-height:1.75;
+      max-width: 720px;
     }
 
     .cta-row{
       display:flex;
-      gap:16px;
+      gap:14px;
       flex-wrap:wrap;
-      margin-top:28px;
+      margin-top:24px;
     }
 
     .btn{
-      padding:16px 22px;
-      border-radius:18px;
-      font-weight:800;
+      padding:15px 18px;
+      border-radius: 18px;
+      font-weight:900;
       text-decoration:none;
       border:1px solid var(--border);
-      transition:0.25s;
+      transition: var(--transition);
       display:inline-flex;
       align-items:center;
       gap:10px;
+      cursor:pointer;
     }
 
     .btn-primary{
       background: linear-gradient(135deg, var(--secondary), #ff7b00);
-      color:#101010;
-      box-shadow: 0 20px 50px rgba(255,183,3,0.25);
+      color:#111;
       border:none;
+      box-shadow: 0 18px 45px rgba(255,183,3,0.25);
     }
-    .btn-primary:hover{transform:translateY(-3px);}
+    .btn-primary:hover{transform: translateY(-3px);}
 
     .btn-ghost{
-      background: rgba(255,255,255,0.04);
+      background: rgba(255,255,255,0.03);
       color: var(--text);
     }
     .btn-ghost:hover{
       border-color: rgba(0,245,212,0.25);
-      transform:translateY(-3px);
+      transform: translateY(-3px);
+    }
+
+    /* Right side */
+    .hero-right{
+      display:grid;
+      gap:16px;
     }
 
     .card{
       background: var(--card);
-      border:1px solid var(--border);
-      border-radius:24px;
-      padding:26px;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
     }
 
-    .right-card h3{
-      font-size:1.4rem;
-      margin-bottom:12px;
+    .card h3{
+      font-size: 1.35rem;
+      margin-bottom: 10px;
       color: var(--primary);
     }
 
-    .right-card p{
-      color:var(--muted);
-      line-height:1.7;
-      font-size:1.05rem;
-    }
+    .muted{color: var(--muted);}
 
-    .info-grid{
-      max-width:1200px;
-      margin:0 auto;
-      padding:30px 20px 80px;
+    .countdown{
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:18px;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+      margin-top: 16px;
     }
 
-    .mini h4{font-size:1.1rem;margin-bottom:8px;}
-    .mini p{color:var(--muted);line-height:1.6;}
+    .cd{
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 14px 12px;
+      text-align:center;
+    }
 
+    .cd .num{
+      font-size: 1.8rem;
+      font-weight: 950;
+      color: var(--secondary);
+    }
+    .cd .lbl{
+      font-size: 0.9rem;
+      opacity: 0.75;
+      margin-top: 4px;
+    }
+
+    /* Stats */
+    .stats{
+      margin-top: 26px;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:16px;
+    }
+
+    .stat{
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      text-align:center;
+      transition: var(--transition);
+    }
+    .stat:hover{
+      transform: translateY(-8px);
+      border-color: rgba(0,245,212,0.20);
+    }
+    .stat .num{
+      font-size: 2.2rem;
+      font-weight: 950;
+      color: var(--primary);
+    }
+    .stat .lbl{
+      color: var(--muted);
+      margin-top: 6px;
+      font-weight:700;
+    }
+
+    /* Curriculum */
+    .section{
+      margin-top: 55px;
+    }
+
+    .section-title{
+      font-size: 2rem;
+      font-weight: 950;
+      margin-bottom: 16px;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+    }
+
+    .pill{
+      display:inline-flex;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:800;
+      margin: 6px 8px 0 0;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+
+    /* FAQ */
+    .faq-item{
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 18px;
+      margin-bottom: 12px;
+      overflow:hidden;
+      background: rgba(255,255,255,0.03);
+    }
+    .faq-q{
+      padding: 16px 16px;
+      cursor:pointer;
+      font-weight:900;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .faq-a{
+      padding: 0 16px 16px;
+      color: var(--muted);
+      display:none;
+      line-height:1.7;
+    }
+    .faq-item.open .faq-a{display:block;}
+
+    /* Modal */
+    .modal{
+      position: fixed;
+      inset:0;
+      background: rgba(0,0,0,0.65);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      z-index:9999;
+    }
+    .modal.show{display:flex;}
+
+    .modal-box{
+      width:min(720px, 100%);
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 26px;
+      padding: 26px;
+      box-shadow: 0 35px 90px rgba(0,0,0,0.65);
+    }
+
+    .modal-box h2{
+      font-size: 1.7rem;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .close{
+      float:right;
+      cursor:pointer;
+      font-size: 1.4rem;
+      font-weight: 950;
+      opacity:0.8;
+    }
+    .close:hover{opacity:1;}
+
+    /* Footer */
     footer{
-      max-width:1200px;
-      margin:0 auto;
-      padding:30px 20px 60px;
+      margin-top: 70px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 30px;
       color: rgba(234,242,255,0.55);
-      border-top:1px solid rgba(255,255,255,0.08);
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
     }
+
+    footer a{
+      color: var(--primary);
+      text-decoration:none;
+      font-weight:800;
+    }
+    footer a:hover{text-decoration:underline;}
 
     @media(max-width: 980px){
       .hero{grid-template-columns:1fr;}
-      h1{font-size:2.6rem;}
-      .info-grid{grid-template-columns:1fr;}
+      h1{font-size:2.4rem;}
+      .stats{grid-template-columns: repeat(2, 1fr);}
+      .grid-2{grid-template-columns:1fr;}
+      .countdown{grid-template-columns: repeat(2, 1fr);}
     }
   </style>
 </head>
@@ -213,122 +433,8 @@ public class App {
 <body>
 
 <header>
-  <div class="brand">
-    <div class="logo"></div>
-    <span>Kastro DevOps Bootcamp</span>
-  </div>
-
-  <nav>
-    <a href="/">Home</a>
-    <a href="/about">About</a>
-    <a href="/health">Health</a>
-  </nav>
-</header>
-
-<section class="hero">
-  <div>
-    <div class="badge">🚀 New Batch Starts: 29 Jan 2026</div>
-    <h1>GitHub Actions + Kubernetes</h1>
-    <p class="subtitle">
-      Learn how real companies build CI/CD pipelines, build Docker images, push to registries,
-      and deploy to Kubernetes like a production DevOps engineer.
-    </p>
-
-    <div class="cta-row">
-      <a class="btn btn-primary" target="_blank"
-         href="https://forms.gle/D5dib9DFsfSN4Koy7">🔥 Reserve Seat</a>
-
-      <a class="btn btn-ghost" href="/api/info">📦 View API Info</a>
-    </div>
-  </div>
-
-  <div class="card right-card">
-    <h3>What you’ll build</h3>
-    <p>
-      ✅ GitHub Actions pipelines<br/>
-      ✅ Docker build & push automation<br/>
-      ✅ EC2 deployment via SSH<br/>
-      ✅ Kubernetes manifests (Pod/Deployment/Service)<br/>
-      ✅ EKS + Ingress + Helm + GitOps
-    </p>
-  </div>
-</section>
-
-<section class="info-grid">
-  <div class="card mini">
-    <h4>📅 Duration</h4>
-    <p>35–40 days live sessions + recordings.</p>
-  </div>
-
-  <div class="card mini">
-    <h4>🛠 Tools</h4>
-    <p>GitHub Actions, Docker, Kubernetes, Helm, AWS EKS, ArgoCD.</p>
-  </div>
-
-  <div class="card mini">
-    <h4>🏆 Projects</h4>
-    <p>5 mini + 2 capstone projects with end-to-end deployments.</p>
-  </div>
-</section>
-
-<footer>
-  © 2026 Learn With Kastro •
-  <a style="color:rgba(0,245,212,0.9)" href="mailto:learnwithkastro@gmail.com">learnwithkastro@gmail.com</a>
-</footer>
-
-</body>
-</html>
-        """;
-    }
-
-    // ABOUT PAGE
-    @GetMapping(value = "/about", produces = MediaType.TEXT_HTML_VALUE)
-    public String about() {
-        return """
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8"/>
-  <title>About - Kastro</title>
-  <style>
-    body{font-family:system-ui;background:#0b1224;color:#eaf2ff;padding:40px;}
-    a{color:#00f5d4;font-weight:700;text-decoration:none;}
-    .box{max-width:900px;margin:auto;background:rgba(255,255,255,0.05);padding:30px;border-radius:18px;border:1px solid rgba(255,255,255,0.10);}
-  </style>
-</head>
-<body>
-  <div class="box">
-    <h1>About This App</h1>
-    <p>
-      This is a Spring Boot app deployed using GitHub Actions CI/CD pipeline.
-    </p>
-    <p>
-      <a href="/">⬅ Back to Home</a>
-    </p>
-  </div>
-</body>
-</html>
-        """;
-    }
-
-    // HEALTH CHECK (Good for Kubernetes readiness)
-    @GetMapping("/health")
-    public String health() {
-        return "OK - " + LocalDate.now();
-    }
-
-    // JSON API
-    @GetMapping("/api/info")
-    public Map<String, Object> info() {
-        return Map.of(
-                "app", "Kastro DevOps Bootcamp",
-                "topic", "GitHub Actions + Kubernetes",
-                "batchStart", "29 January 2026",
-                "status", "RUNNING"
-        );
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
-    }
-}
+  <div class="nav">
+    <div class="brand">
+      <div class="logo"></div>
+      <span>Learn With Kastro</span>
+    </di
