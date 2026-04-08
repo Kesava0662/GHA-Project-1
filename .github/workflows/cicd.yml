@@ -5,7 +5,7 @@ on:
 
 jobs:
  build_push_deploy:
-  runs: ubuntu-latest #github hosted runr
+  run: ubuntu-latest #github hosted runr
 
   steps:
   - name: checkout code
