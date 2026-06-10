@@ -33,13 +33,12 @@ jobs:
         run: mvn clean package -DskipTests
 
       # -------------------------
-      # 4. Verify Files
+      # 4. Verify Project Files
       # -------------------------
       - name: Verify Files
         run: |
           echo "Listing project files..."
           ls -la
-          echo "Checking Dockerfile..."
           test -f Dockerfile || (echo "Dockerfile NOT FOUND" && exit 1)
 
       # -------------------------
@@ -52,18 +51,16 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # -------------------------
-      # 6. Build Docker Image (FIXED)
+      # 6. Build Docker Image (FIXED LINE)
       # -------------------------
       - name: Build Docker Image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest .
+        run: docker build -t chennakesavulu0662/java-docker-app:latest .
 
       # -------------------------
       # 7. Push Docker Image
       # -------------------------
       - name: Push Docker Image
-        run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest
+        run: docker push chennakesavulu0662/java-docker-app:latest
 
       # -------------------------
       # 8. Deploy to EC2
@@ -77,19 +74,19 @@ jobs:
           script: |
             set -e
 
-            echo "Stopping existing container (if any)..."
+            echo "Stopping old container..."
             docker stop javaapp || true
             docker rm javaapp || true
 
             echo "Pulling latest image..."
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest
+            docker pull chennakesavulu0662/java-docker-app:latest
 
             echo "Running new container..."
             docker run -d \
               --name javaapp \
               --restart unless-stopped \
               -p 8080:8080 \
-              ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest
+              chennakesavulu0662/java-docker-app:latest
 
             echo "Deployment successful!"
             docker ps
