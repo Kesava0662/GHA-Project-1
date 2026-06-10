@@ -8,44 +8,66 @@ on:
 jobs:
   build_push_deploy:
     runs-on: ubuntu-latest
-    
 
     steps:
+      # -------------------------
+      # 1. Checkout Code
+      # -------------------------
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # -------------------------
+      # 2. Setup Java 17
+      # -------------------------
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+          cache: maven
 
+      # -------------------------
+      # 3. Build Maven Project
+      # -------------------------
       - name: Build Maven Project
         run: mvn clean package -DskipTests
 
+      # -------------------------
+      # 4. Verify Project Files
+      # -------------------------
       - name: Verify Files
         run: |
           pwd
           ls -la
           echo "Checking Dockerfile..."
-          test -f Dockerfile && echo "Dockerfile Found" || echo "Dockerfile Missing"
+          test -f Dockerfile && echo "Dockerfile Found" || (echo "Dockerfile Missing" && exit 1)
 
+      # -------------------------
+      # 5. DockerHub Login
+      # -------------------------
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # -------------------------
+      # 6. Build Docker Image (FIXED)
+      # -------------------------
       - name: Build Docker Image
         run: |
-          docker build \
-          -t ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest \
-          .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest .
 
+      # -------------------------
+      # 7. Push Docker Image
+      # -------------------------
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest
 
+      # -------------------------
+      # 8. Deploy to EC2
+      # -------------------------
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -53,15 +75,21 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
+
+            echo "Stopping old container..."
             docker stop javaapp || true
             docker rm javaapp || true
 
+            echo "Pulling latest image..."
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest
 
+            echo "Running new container..."
             docker run -d \
               --name javaapp \
               --restart unless-stopped \
               -p 8080:8080 \
               ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest
 
+            echo "Deployment complete!"
             docker ps
