@@ -10,52 +10,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout source code
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Setup Java
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      # Build Maven project
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      # Debug project structure
-      - name: Verify Files
+      - name: Verify Project Files
         run: |
-          echo "Current Directory:"
           pwd
-          echo "Repository Contents:"
           ls -la
+          echo "Checking Dockerfile..."
+          test -f Dockerfile && echo "Dockerfile Found" || echo "Dockerfile Missing"
 
-      # Verify DockerHub username secret exists
-      - name: Verify DockerHub Username
+      - name: Set Image Name
         run: |
-          echo "DockerHub Username Length:"
-          echo "${{ secrets.DOCKERHUB_USERNAME }}" | wc -c
+          echo "IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest" >> $GITHUB_ENV
 
-      # Login to DockerHub
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build Docker Image
       - name: Build Docker Image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest .
+        run: |
+          echo "Building Image: $IMAGE_NAME"
+          docker build -t "$IMAGE_NAME" .
 
-      # Push Docker Image
-      - name: Push Docker Image to DockerHub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/java-docker-app:latest
+      - name: Push Docker Image
+        run: |
+          docker push "$IMAGE_NAME"
 
-      # Deploy to EC2
-      - name: Deploy Container to EC2
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
